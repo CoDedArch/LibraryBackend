@@ -39,8 +39,8 @@ Ensure you have the following installed:
     ```bash ssh
     git clone git@github.com:CoDedArch/LibraryBackend.git
     ```
-    ```bash html
-    git clone git@github.com:CoDedArch/LibraryBackend.git
+    ```bash https
+    git clone https://github.com/CoDedArch/LibraryBackend.git
     ```
 2. **Navigate to the project directory**:
     ```bash
