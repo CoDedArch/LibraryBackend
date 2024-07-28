@@ -80,3 +80,6 @@ Ensure you have the following installed:
 To start the development server, run:
 ```bash
 rav run server
+
+## Contribution
+When  you done cloning, switch to a new brach, implement the feature and push it. after wards open a pr on github.
