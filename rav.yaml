@@ -2,3 +2,4 @@ scripts:
   server: cd app && python manage.py runserver
   makemigrations: cd app && python manage.py makemigrations
   migrate: cd app && python manage.py migrate
+  superuser: cd app $$ python manage.py createsuperuser
