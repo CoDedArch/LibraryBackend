@@ -18,12 +18,7 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
-from ninja import NinjaAPI
-from ninja import Schema
-
-api = NinjaAPI()
-
-
+from .api import api
 #BookDownload download books to the cloud
 #bookmarking
 #search
