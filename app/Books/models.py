@@ -73,6 +73,9 @@ class Book(Model):
     def total_shares(self):
         return f'{self.bookactivity_set.filter(activity_type='share').count()}'
     
+    def __str__(self) -> str:
+        return self.title
+
     class Meta:
         constraints = [
             UniqueConstraint(fields=['title','publisher'], name='unique_title_publisher')
@@ -114,4 +117,4 @@ class Rating(models.Model):
     value = models.DecimalField(max_digits=3, decimal_places=2)
 
     def __str__(self):
-        return f'{self.value} for {self.book.title} by {self.user.username}'
+        return f'{self.value} for {self.book.title} by {self.reader.user.username}'

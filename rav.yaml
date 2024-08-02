@@ -3,3 +3,7 @@ scripts:
   makemigrations: cd app && python manage.py makemigrations
   migrate: cd app && python manage.py migrate
   superuser: cd app $$ python manage.py createsuperuser
+  curl_auth: | 
+    curl -X POST -H "Content-Type:application/json" -d '{"username":"k","password":"k"}' http://127.0.0.1:8000/api/token/pair
+  curl_protect: |  
+    curl -X GET -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzIyNTU1MjE1LCJpYXQiOjE3MjI1NTQ5MTUsImp0aSI6ImI1MjM4NzkzZDIyOTRmY2I5MWUwYTI3YWQ1NWE3MTI0IiwidXNlcl9pZCI6MX0.JLPHEj1jjP3V879x1a2GEQEXqCk5JtJ799oMFUCKYX0" http://127.0.0.1:8000/api/me
