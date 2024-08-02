@@ -33,6 +33,14 @@ class BookSchema(Schema):
     total_downloads: int
     total_shares: int
 
+class BookAuthorSchema(Schema):
+    id: int
+    title: str
+    book_type: str
+    cover_img: str
+    publication_date: date
+    
+
 class ReadingStatusSchema(Schema):
     id: int
     reader_id: int
