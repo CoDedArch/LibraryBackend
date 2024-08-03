@@ -70,6 +70,9 @@ class Book(Model):
     
     def readers_finished_reading(self):
         return f'{self.readingstatus_set.filter(status='finished').count()}'
+    
+    def readers_want_to_start_reading(self):
+        return f'{self.readingstatus_set.filter(status='want to').count()}'
 
     def total_downloads(self):
         return f'{self.bookactivity_set.filter(activity_type='download').count()}'
@@ -90,11 +93,12 @@ class ReadingStatus(models.Model):
     STATUS_CHOICES = [
         ('reading', 'Reading'),
         ('finished', 'Finished'),
+        ('want to', 'Want to Read'),
     ]
 
     reader = models.ForeignKey(Reader, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
 
     def __str__(self):
         return f'{self.reader.user.username} - {self.book.title} - {self.status}'
