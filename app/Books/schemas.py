@@ -1,7 +1,7 @@
 from ninja import Schema
 from ninja import NinjaAPI, Schema
 from datetime import date
-from pydantic import Field
+from pydantic import Field, BaseModel, EmailStr
 from typing import List, Optional
 
 class ReaderSchema(Schema):
@@ -12,6 +12,15 @@ class GenreSchema(Schema):
     id: int
     genre: str
     # get_books: List
+
+class SignupSchema(BaseModel):
+    fullname: str
+    date_of_birth: date
+    city: str
+    username: str
+    email: EmailStr
+    password: str
+    confirmpassword: str
 
 class BookSchema(Schema):
     id: int
