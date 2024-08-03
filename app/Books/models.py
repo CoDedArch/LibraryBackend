@@ -8,6 +8,10 @@ def book_dir(instance, filename):
 
 class Reader(Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE, related_name='user_reader')
+    fullname = models.CharField(max_length=255, null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    city = models.CharField(max_length=255, null=True, blank=True)
+
     def get_books(self):
         return Book.objects.filter(reader=self)
     
