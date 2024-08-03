@@ -37,6 +37,7 @@ def list_books_by_genre(request, genre: int):
             "number_of_ratings": book.number_of_ratings(),
             "readers_currently_reading": book.readers_currently_reading(),
             "readers_finished_reading": book.readers_finished_reading(),
+            "want_to": book.readers_want_to_start_reading(),
             "total_downloads": book.total_downloads(),
             "total_shares": book.total_shares(),
         }
@@ -76,6 +77,7 @@ def a_book(request, book_id:int):
         "number_of_ratings": book.number_of_ratings(),
         "readers_currently_reading": book.readers_currently_reading(),
         "readers_finished_reading": book.readers_finished_reading(),
+        "want_to": book.readers_want_to_start_reading(),
         "total_downloads": book.total_downloads(),
         "total_shares": book.total_shares()
     }
@@ -101,6 +103,7 @@ def list_books(request):
             "number_of_ratings": book.number_of_ratings(),
             "readers_currently_reading": book.readers_currently_reading(),
             "readers_finished_reading": book.readers_finished_reading(),
+            "want_to": book.readers_want_to_start_reading(),
             "total_downloads": book.total_downloads(),
             "total_shares": book.total_shares(),
         }
