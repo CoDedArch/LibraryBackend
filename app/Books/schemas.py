@@ -39,6 +39,7 @@ class BookSchema(Schema):
     number_of_ratings: int
     readers_currently_reading: int
     readers_finished_reading: int
+    want_to: int
     total_downloads: int
     total_shares: int
 
