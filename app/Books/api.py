@@ -1,8 +1,16 @@
 from ninja import Router
+from ninja_jwt.authentication import JWTAuth
 from typing import List
 from django.shortcuts import get_object_or_404
-from .schemas import (ReaderSchema, GenreSchema, BookSchema, ReadingStatusSchema, BookActivitySchema, RatingSchema, BookAuthorSchema)
-from .models import (Reader, Genre, Book, ReadingStatus, BookActivity, Rating)
+from .schemas import (ReaderSchema, GenreSchema,
+                      BookSchema, ReadingStatusSchema, 
+                      BookActivitySchema, RatingSchema, 
+                      BookAuthorSchema)
+from .models import (Reader, Genre, Book, ReadingStatus, 
+                     BookActivity, Rating)
+from django.http import FileResponse, Http404
+from .utils import get_pdf_pages
+
 router = Router()
 
 # API Endpoints
@@ -10,6 +18,25 @@ router = Router()
 def list_readers(request):
     readers = Reader.objects.all()
     return readers
+
+@router.get("/download_book/{book_id}",auth=JWTAuth())
+def download_book(request, book_id: int):
+    try:
+        book = Book.objects.get(id=book_id)
+        response = FileResponse(book.pdf_file.open(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{book.title}.pdf"'
+        return response
+    except Book.DoesNotExist:
+        raise Http404("Book does not exist")
+    
+@router.get("/book/{book_id}/pages")
+def get_book_pages(request, book_id: int):
+    try:
+        book = Book.objects.get(id=book_id)
+        pages = get_pdf_pages(book)
+        return {"pages": pages}
+    except Book.DoesNotExist:
+        return {"error": "Book does not exist"}
 
 @router.get("/genres", response=List[GenreSchema])
 def list_genres(request):
@@ -43,6 +70,7 @@ def list_books_by_genre(request, genre: int):
         }
         for book in books
     ]
+
 @router.get("/publisher/{publisher}", response=List[BookAuthorSchema])
 def list_books_by_genre(request, publisher: str):
     books = Book.objects.filter(publisher=publisher)
