@@ -8,11 +8,13 @@ class ReaderSchema(Schema):
     id: int
     user_id: int
 
+
 class GenreSchema(Schema):
     id: int
     genre: str
     # get_books: List
 
+    
 class SignupSchema(BaseModel):
     fullname: str
     date_of_birth: date
@@ -21,6 +23,7 @@ class SignupSchema(BaseModel):
     email: EmailStr
     password: str
     confirmpassword: str
+
 
 class BookSchema(Schema):
     id: int
@@ -43,6 +46,7 @@ class BookSchema(Schema):
     total_downloads: int
     total_shares: int
 
+
 class BookAuthorSchema(Schema):
     id: int
     title: str
@@ -57,12 +61,14 @@ class ReadingStatusSchema(Schema):
     book_id: int
     status: str
 
+
 class BookActivitySchema(Schema):
     id: int
     reader_id: int
     book_id: int
     activity_type: str
     timestamp: str
+
 
 class RatingSchema(Schema):
     id: int
