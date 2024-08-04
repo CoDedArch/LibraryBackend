@@ -47,6 +47,7 @@ class Book(Model):
 
     title = models.CharField(max_length=120, verbose_name='book title')
     book_type = models.CharField(max_length=2, choices=BookType.choices)
+    pdf_file = models.FileField(upload_to='books/pdfs/', null=True, blank=True)
     cover_img = models.ImageField(upload_to=book_dir)
     publication_date = models.DateField()
     no_pages = models.IntegerField(null=True, blank=True)
