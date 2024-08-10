@@ -22,7 +22,13 @@ def list_readers(request):
 @router.get("/download_book/{book_id}",auth=JWTAuth())
 def download_book(request, book_id: int):
     try:
+        user = request.user
+        reader, created = Reader.objects.get_or_create(user=user)
+        # retrieve book by id
         book = Book.objects.get(id=book_id)
+        # create a Book activity instance 
+        BookActivity.objects.create(reader=reader, book=book, activity_type='download')
+        # return book as a fileResponse
         response = FileResponse(book.pdf_file.open(), content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{book.title}.pdf"'
         return response
