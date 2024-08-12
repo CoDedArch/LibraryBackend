@@ -5,11 +5,11 @@ from django.shortcuts import get_object_or_404
 from .schemas import (ReaderSchema, GenreSchema,
                       BookSchema, ReadingStatusSchema, 
                       BookActivitySchema, RatingSchema, 
-                      BookAuthorSchema)
+                      BookAuthorSchema, UserRatingSchema)
 from .models import (Reader, Genre, Book, ReadingStatus, 
                      BookActivity, Rating)
 from django.http import FileResponse, Http404
-from .utils import get_pdf_pages
+from .utils import get_pdf_pages_as_text
 
 router = Router()
 
@@ -18,6 +18,40 @@ router = Router()
 def list_readers(request):
     readers = Reader.objects.all()
     return readers
+
+@router.get("/{book_id}/pages", auth=JWTAuth())
+def get_book_pages(request, book_id):
+    try:
+        book = Book.objects.get(id=book_id)
+        pages_text = get_pdf_pages_as_text(book)
+        return {"pages": pages_text}
+    except Book.DoesNotExist:
+        return {"error": "Book not found"}
+
+
+@router.post("/book/rating", auth=JWTAuth())
+def rate_a_book(request, payload: RatingSchema):
+    try:
+        user = request.user
+        reader, created = Reader.objects.get_or_create(user=user)
+
+        existing_rating = Rating.objects.filter(book_id=payload.bookId, reader=reader).first()
+        if existing_rating:
+            # Update the existing rating
+            existing_rating.value = payload.rating
+            existing_rating.save()
+            return {"message": "Rating updated successfully!", "rating": existing_rating.value}
+
+        # Create a new Rating instance
+        rating = Rating.objects.create(
+            book_id=payload.bookId,
+            reader=reader,
+            value=payload.rating,
+        )
+        return {"message": "Rating saved successfully!", "rating": rating.value}
+    except Exception as e:
+        return {"error": str(e)}
+
 
 @router.get("/download_book/{book_id}",auth=JWTAuth())
 def download_book(request, book_id: int):
@@ -158,3 +192,23 @@ def list_book_activities(request):
 def list_ratings(request):
     ratings = Rating.objects.all()
     return ratings
+
+@router.get("/user/ratings/{book_id}", auth=JWTAuth())
+def get_user_ratings_for_book(request, book_id: int):
+    try:
+        user = request.user
+        reader, created = Reader.objects.get_or_create(user=user)
+
+        # Retrieve ratings for the specified book by the current user
+        user_ratings = Rating.objects.filter(book_id=book_id, reader=reader)
+
+        print(user_ratings)
+
+        # You can further process or serialize the ratings as needed
+        serialized_ratings = [{"value": rating.value} for rating in user_ratings]
+
+        print(serialized_ratings)
+
+        return {"user_ratings": serialized_ratings}
+    except Exception as e:
+        return {"error": str(e)}
