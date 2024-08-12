@@ -2,14 +2,17 @@ import fitz  # type: ignore # PyMuPDF
 from PIL import Image
 import io
 
-def get_pdf_pages(book):
-    pdf_document = fitz.open(book.pdf_file.path)
-    pages = []
-    for page_num in range(len(pdf_document)):
-        page = pdf_document.load_page(page_num)
-        pages.append(page.get_text("text"))
-    return pages
-
+def get_pdf_pages_as_text(book):
+    try:
+        pdf_document = fitz.open(book.pdf_file.path)
+        pages_text = []
+        for page_num in range(len(pdf_document)):
+            page = pdf_document.load_page(page_num)
+            page_text = page.get_text("text")
+            pages_text.append(page_text)
+        return pages_text
+    except book.DoesNotExist:
+        print("couldn't Extract PDF text")
 
 
 def get_pdf_pages_as_images(book):
