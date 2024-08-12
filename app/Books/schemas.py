@@ -71,7 +71,8 @@ class BookActivitySchema(Schema):
 
 
 class RatingSchema(Schema):
-    id: int
-    book_id: int
-    reader_id: int
+    bookId: int
+    rating: float
+
+class UserRatingSchema(Schema):
     value: float
