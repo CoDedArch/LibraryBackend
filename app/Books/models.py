@@ -89,6 +89,38 @@ class Book(Model):
             UniqueConstraint(fields=['title','publisher'], name='unique_title_publisher')
         ]
 
+class Heading(Model):
+    title = models.CharField(verbose_name="heading", max_length=100)
+    heading_content = models.TextField(max_length=1500, null=True, blank=True)
+    heading_image = models.ImageField(upload_to=book_dir, null=True, blank=True)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return f'{self.title} --> book {self.book.title}'
+    
+    def has_content (self):
+        return True if self.heading_content else False
+    
+    def has_image (self):
+        return True if self.heading_image else False
+
+
+class SubHeading(Model):
+    title = models.CharField(verbose_name="subheading", max_length=100)
+    subheading_content = models.TextField(max_length=1500, null=True, blank=True)
+    heading_image = models.ImageField(upload_to=book_dir, null=True, blank=True)
+    heading = models.ForeignKey(Heading, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return f'{self.title} --> heading {self.heading.title}'
+    
+    def has_content (self):
+        return True if self.subheading_content else False
+    
+    def has_image (self):
+        return True if self.heading_image else False
+
+
 
 class ReadingStatus(models.Model):
     STATUS_CHOICES = [
