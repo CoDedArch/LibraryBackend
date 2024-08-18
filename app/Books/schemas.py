@@ -76,3 +76,19 @@ class RatingSchema(Schema):
 
 class UserRatingSchema(Schema):
     value: float
+
+class SubHeadingSchema(BaseModel):
+    subheading_id: int
+    subheading_name: str
+    subheading_content: str
+    subheading_image: str
+
+class HeadingSchema(BaseModel):
+    heading_id: int
+    heading_name: str
+    heading_content: str
+    heading_image: str
+    subheadings: List[SubHeadingSchema]
+
+class BookContentSchema(BaseModel):
+    headings: List[HeadingSchema]
