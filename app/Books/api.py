@@ -5,11 +5,13 @@ from django.shortcuts import get_object_or_404
 from .schemas import (ReaderSchema, GenreSchema,
                       BookSchema, ReadingStatusSchema, 
                       BookActivitySchema, RatingSchema, 
-                      BookAuthorSchema, UserRatingSchema)
+                      BookAuthorSchema,BookContentSchema)
 from .models import (Reader, Genre, Book, ReadingStatus, 
-                     BookActivity, Rating)
+                     BookActivity, Rating, Heading, SubHeading)
 from django.http import FileResponse, Http404
-from .utils import get_pdf_pages_as_text
+
+# from .utils import get_pdf_pages_as_text
+
 
 router = Router()
 
@@ -19,14 +21,42 @@ def list_readers(request):
     readers = Reader.objects.all()
     return readers
 
-@router.get("/{book_id}/pages", auth=JWTAuth())
-def get_book_pages(request, book_id):
+@router.get("/{book_id}/content", response=List[dict])
+def get_book_content(request, book_id):
     try:
         book = Book.objects.get(id=book_id)
-        pages_text = get_pdf_pages_as_text(book)
-        return {"pages": pages_text}
     except Book.DoesNotExist:
-        return {"error": "Book not found"}
+        raise {"error": "Book not Found"}
+    
+    headings = Heading.objects.filter(book = book)
+    book_content =  []
+    for heading in headings:
+        SubHeadings = SubHeading.objects.filter(heading=heading)
+        heading_data = {
+            "heading_id": heading.id,
+            "heading_name": heading.title,
+            "heading_content": heading.heading_content if heading.has_content() else "",
+            "heading_image": request.build_absolute_uri(heading.heading_image.url)  if  heading.has_image() else "",
+            "subheadings": [
+                {
+                    "subheading_id": sub.id,
+                    "subheading_name": sub.title,
+                    "subheading_content": sub.subheading_content if sub.has_content() else "",
+                    "subheading_image": request.build_absolute_uri(sub.heading_image.url)  if  sub.has_image() else ""
+                } for sub in SubHeadings
+            ]
+        }
+        book_content.append(heading_data)
+    return book_content
+
+
+# def get_book_pages(request, book_id):
+#     try:
+#         book = Book.objects.get(id=book_id)
+#         pages_text = get_pdf_pages_as_text(book)
+#         return {"pages": pages_text}
+#     except Book.DoesNotExist:
+#         return {"error": "Book not found"}
 
 
 @router.post("/book/rating", auth=JWTAuth())
@@ -69,14 +99,14 @@ def download_book(request, book_id: int):
     except Book.DoesNotExist:
         raise Http404("Book does not exist")
     
-@router.get("/book/{book_id}/pages")
-def get_book_pages(request, book_id: int):
-    try:
-        book = Book.objects.get(id=book_id)
-        pages = get_pdf_pages(book)
-        return {"pages": pages}
-    except Book.DoesNotExist:
-        return {"error": "Book does not exist"}
+# @router.get("/book/{book_id}/pages")
+# def get_book_pages(request, book_id: int):
+#     try:
+#         book = Book.objects.get(id=book_id)
+#         pages = get_pdf_pages(book)
+#         return {"pages": pages}
+#     except Book.DoesNotExist:
+#         return {"error": "Book does not exist"}
 
 @router.get("/genres", response=List[GenreSchema])
 def list_genres(request):
