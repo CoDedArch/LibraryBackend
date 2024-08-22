@@ -21,7 +21,7 @@ def list_readers(request):
     readers = Reader.objects.all()
     return readers
 
-@router.get("/{book_id}/content", response=List[dict])
+@router.get("/{book_id}/content", auth=JWTAuth(), response=List[dict])
 def get_book_content(request, book_id):
     try:
         book = Book.objects.get(id=book_id)
@@ -141,9 +141,9 @@ def list_books_by_genre(request, genre: int):
         for book in books
     ]
 
-@router.get("/publisher/{publisher}", response=List[BookAuthorSchema])
-def list_books_by_genre(request, publisher: str):
-    books = Book.objects.filter(publisher=publisher)
+@router.get("/publisher/{book_id}/{publisher}", response=List[BookAuthorSchema])
+def list_books_by_genre(request,book_id,publisher: str):
+    books = Book.objects.filter(publisher=publisher).exclude(id = book_id)
     return [
         {
             "id": book.id,
