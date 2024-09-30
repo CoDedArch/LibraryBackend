@@ -2,10 +2,12 @@ from ninja import Router
 from ninja_jwt.authentication import JWTAuth
 from typing import List
 from django.shortcuts import get_object_or_404
-from .schemas import (ReaderSchema, GenreSchema,
+# Import Schemas that have been constructed for inflow and outflow of data to our API
+from .schemas import (GenreSchema,
                       BookSchema, ReadingStatusSchema, 
                       BookActivitySchema, RatingSchema, 
-                      BookAuthorSchema,BookContentSchema)
+                      BookAuthorSchema)
+
 from .models import (Reader, Genre, Book, ReadingStatus, 
                      BookActivity, Rating, Heading, SubHeading)
 from django.http import FileResponse, Http404
@@ -16,10 +18,10 @@ from django.http import FileResponse, Http404
 router = Router()
 
 # API Endpoints
-@router.get("/readers", response=List[ReaderSchema])
-def list_readers(request):
-    readers = Reader.objects.all()
-    return readers
+# @router.get("/readers", response=List[ReaderSchema])
+# def list_readers(request):
+#     readers = Reader.objects.all()
+#     return readers
 
 @router.get("/{book_id}/content", auth=JWTAuth(), response=List[dict])
 def get_book_content(request, book_id):
@@ -48,6 +50,39 @@ def get_book_content(request, book_id):
         }
         book_content.append(heading_data)
     return book_content
+
+# retrieve the audio of the book
+@router.get("/{book_id}/audio",auth=JWTAuth())
+def playAudio(request, book_id: int):
+    print("playing Audio")
+    try:
+        book = Book.objects.get(id=book_id)
+    except Book.DoesNotExist:
+        raise {"error": "Book not Found"}
+    
+    audio_uri = request.build_absolute_uri(book.pdf_file.url)
+    
+    return {"audio_uri": audio_uri}
+
+
+
+@router.get("/search/{book_name}", response=List[dict])
+def search_for_book(request, book_name: str):
+    # Assuming you want to search for books whose title starts with the given book_name
+    matching_books = Book.objects.filter(title__istartswith=book_name)
+
+    if matching_books:
+        book_list = []
+        for book in matching_books:
+            book_info = {
+                "id": book.id,
+                "title": book.title,
+                "cover_img": request.build_absolute_uri(book.cover_img.url) if book.cover_img else None,
+            }
+            book_list.append(book_info)
+
+        return book_list
+    raise Http404("Book does not exist")
 
 
 # def get_book_pages(request, book_id):
@@ -110,16 +145,18 @@ def download_book(request, book_id: int):
 
 @router.get("/genres", response=List[GenreSchema])
 def list_genres(request):
-    genres = Genre.objects.all()
+    genres = Genre.objects.all().order_by('-id')
     return genres
 
 @router.get("/books/genre/{genre}", response=List[BookSchema])
 def list_books_by_genre(request, genre: int):
     books = Book.objects.filter(genre=genre)
+
     return [
         {
             "id": book.id,
             "title": book.title,
+            "genre_name": genre,
             "book_type": book.book_type,
             "cover_img": request.build_absolute_uri(book.cover_img.url) if book.cover_img else None,
             "publication_date": book.publication_date,

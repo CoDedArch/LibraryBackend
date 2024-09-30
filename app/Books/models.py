@@ -1,10 +1,26 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser
 from django.db.models import Model, UniqueConstraint
 
 def book_dir(instance, filename):
     return f'{instance.title}/{filename}'
 
+
+class CustomUser(AbstractUser):
+    email = models.EmailField(unique=True)
+     # Add unique related_name for groups and user_permissions to avoid conflicts
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='customuser_set',  # Add this to resolve clash
+        blank=True,
+        help_text='The groups this user belongs to.'
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='customuser_permissions_set',  # Add this to resolve clash
+        blank=True,
+        help_text='Specific permissions for this user.'
+    )
 
 class Reader(Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE, related_name='user_reader')

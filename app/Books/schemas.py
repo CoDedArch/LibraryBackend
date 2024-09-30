@@ -4,11 +4,6 @@ from datetime import date
 from pydantic import Field, BaseModel, EmailStr
 from typing import List, Optional
 
-class ReaderSchema(Schema):
-    id: int
-    user_id: int
-
-
 class GenreSchema(Schema):
     id: int
     genre: str
@@ -46,6 +41,12 @@ class BookSchema(Schema):
     total_downloads: int
     total_shares: int
 
+class ReaderInfoSchema(Schema):
+    username: str
+    total_books_read: int
+    book_read: list[BookSchema]
+
+
 
 class BookAuthorSchema(Schema):
     id: int
@@ -74,8 +75,10 @@ class RatingSchema(Schema):
     bookId: int
     rating: float
 
+
 class UserRatingSchema(Schema):
     value: float
+
 
 class SubHeadingSchema(BaseModel):
     subheading_id: int
@@ -83,12 +86,14 @@ class SubHeadingSchema(BaseModel):
     subheading_content: str
     subheading_image: str
 
+
 class HeadingSchema(BaseModel):
     heading_id: int
     heading_name: str
     heading_content: str
     heading_image: str
     subheadings: List[SubHeadingSchema]
+
 
 class BookContentSchema(BaseModel):
     headings: List[HeadingSchema]
